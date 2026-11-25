@@ -1,8 +1,8 @@
 # ColdBox / BoxLang Security Assessment
 
-Hi, I’m Noor. This is my first proper web application security assessment, which I completed during my cybersecurity internship.
+Hi I’m Noor. This is my first proper web application security assessment which I completed during my cybersecurity internship.
 
-I wanted to learn how security testing works in practice, so I built a small local lab instead of testing anything outside my own machine. The project uses a ColdBox application running on BoxLang in Docker. I tested it, reviewed the results, fixed a couple of configuration issues, and then added a web application firewall (WAF) to see how it handled malicious requests.
+I wanted to learn how security testing works in practice so I built a small local lab instead of testing anything outside my own machine. The project uses a ColdBox application running on BoxLang in Docker. I tested it, reviewed the results, fixed a couple of configuration issues, and then added a web application firewall (WAF) to see how it handled malicious requests.
 
 The full report is in the [`report/`](report/) folder. This README is a shorter overview of what I did and what I learned.
 
@@ -49,9 +49,9 @@ I used Nmap and WhatWeb to see what information the server was exposing. I found
 
 ### 3. Automated scanning
 
-I ran Nikto, which sent around 7,945 requests and reported 23 items.
+I ran Nikto which sent around 7,945 requests and reported 23 items.
 
-At first, that number looked worrying. After checking the results, I realised that most of them were false positives because Nikto was checking for PHP files, and this application is not built with PHP.
+At first that number looked worrying. After checking the results, I realised that most of them were false positives because Nikto was checking for PHP files and this application is not built with PHP.
 
 The useful findings were that three security headers were missing:
 
@@ -59,13 +59,13 @@ The useful findings were that three security headers were missing:
 - X-Content-Type-Options
 - Permissions-Policy
 
-This taught me that scanner results are a starting point, not proof that something is vulnerable.
+This taught me that scanner results are a starting point not proof that something is vulnerable.
 
 ![Nikto scan](screenshots/03_nikto_scan.png)
 
 ### 4. Testing XSS and SQL injection
 
-I created a simple page with a Search field and a Username field, then tried a basic XSS payload and a basic SQL injection string through the URL.
+I created a simple page with a Search field and a Username field then tried a basic XSS payload and a basic SQL injection string through the URL.
 
 Nothing happened. The page uses `encodeForHTML()`, and there is no database connected to the application.
 
@@ -87,7 +87,7 @@ I looked at the `jsessionid` cookie and found:
 
 I used Burp Suite to send a login request with only a username. The server responded with a `302` redirect and issued a new cookie.
 
-I did not send an old session cookie first, so I could not confirm whether the session ID changes after login. I added session rotation to my list of things to test next.
+I did not send an old session cookie first so I could not confirm whether the session ID changes after login. I added session rotation to my list of things to test next.
 
 ![Burp login test](screenshots/06_burp_login_test.png)
 
@@ -159,9 +159,9 @@ Then I checked the WAF logs to understand why the request was blocked. This was 
 
 ## What I learned
 
-- Automated tools are helpful, but their results need to be checked manually.
+- Automated tools are helpful but their results need to be checked manually.
 - Development settings should not be used in production.
-- A WAF can block attacks, but the logs are important for understanding why.
+- A WAF can block attacks but the logs are important for understanding why.
 - Being honest about the limits of a test is just as important as finding issues.
 
 ---
